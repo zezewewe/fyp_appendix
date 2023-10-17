@@ -1,0 +1,253 @@
+// Frontend Estimation Display index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blue Beacon</title>
+  <style> /* CSS Styling */
+    body{
+      margin: 0;
+      padding: 0;
+      display: flex;
+      background-color: #f0f0f0; 
+      font-family: Arial, sans-serif;
+      flex-direction: column;
+      align-items: center;
+    }
+    #title {
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: white;
+    }
+    #content {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      padding: 20px;
+    }
+    #map-rectangle {
+      /* flex: 1; */
+      width: 1000px;
+      height: 1000px;
+      border: 2px solid black;
+      position: relative; 
+      margin: 0;
+      padding: 0;
+    }
+    .red-triangle {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 20px solid red;
+      transform: translate(-50%, -50%);
+    }
+    .triangle-label {
+      position: absolute;
+      font-size: 12px;
+      text-align: center;
+      transform: translate(-130%, 10%);
+    }
+    .grey-rectangle {
+      position: absolute;
+      opacity: 0.5;
+    }
+    .rectangle-label {
+      position: absolute;
+      font-size: 20px;
+      text-align: center;
+    }
+    .black-line {
+    position: absolute;
+    background-color: black;
+    }
+    .black-rectangle {
+      position: absolute;
+      background-color: black;
+    }
+    #pose-container {
+      position: relative;
+      left: 0 px;
+      top: 0 px;
+      width: 20px;
+      height: 20px;
+    }
+    #beacon {
+      position: absolute;
+      left: 0%;
+      top: 0%;
+      width: 20px;
+      height: 20px;
+      background-color: blue;
+      border-radius: 50%; /* Gives circular shape */
+    }
+    #line-left {
+      position: absolute;
+      left: 10px;
+      top: 0;
+      width: 50px;
+      height: 4px;
+      background-color:blue;
+      transform-origin: left;
+      transform: rotate(-50deg);
+    }
+    #line-right {
+      position: absolute;
+      left: 10px;
+      top: 17px;
+      width: 50px;
+      height: 4px;
+      background-color:blue;
+      transform-origin: left;
+      transform: rotate(50deg);
+    }
+    #arrow-tail {
+      position: absolute;
+      left: 10px;
+      top: 9px;
+      width: 140px;
+      height: 2px;
+      background-color: rgb(0, 255, 251);
+    }
+    #arrow-head {
+      position: absolute;
+      /* left: 150px; */
+      left: var(--arrow-length);
+      top: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 10px 0 10px 30px;
+      border-color: transparent transparent transparent rgb(0, 255, 251);
+    }
+  </style>
+</head>
+
+<body> 
+  <div id="title">
+    <h1>FYP Demo: Wifi-based Pose Estimation using ESP32</h1>
+    <h2>Supervisor: Prof Xie Lihua | Examiner: Assoc Prof Soong Boon Hee </h2>
+    <h2>Candidate: Ng Ze Wei</h2>
+  </div>  
+  <div id="content"></div>
+    <div id="map-rectangle">
+      <div class="red-triangle" style="left: 250px; top: 800px;">
+        <div class="triangle-label">AP0</div>
+      </div>
+      <div class="red-triangle" style="left: 250px; top: 500px;">
+        <div class="triangle-label">AP1</div>
+      </div>
+      <div class="red-triangle" style="left: 250px; top: 200px;">
+        <div class="triangle-label">AP2</div>
+      </div>
+      <div class="red-triangle" style="left: 650px; top: 300px;">
+        <div class="triangle-label">AP3</div>
+      </div>
+      <div class="red-triangle" style="left: 550px; top: 600px;">
+        <div class="triangle-label">AP4</div>
+      </div>
+      <div class="red-triangle" style="left: 400px; top: 400px;">
+        <div class="triangle-label">AP5</div>
+      </div>
+
+      <div class="grey-rectangle" style="left: 0; top: 150px; width: 200px; height: 450px; background-color: rgb(202, 197, 197);">
+        <div class="rectangle-label" style="left:75px; top:200px">Office</div>
+      </div>
+
+      <div class="grey-rectangle" style="left: 0; top: 650px; width: 200px; height: 250px; background-color: rgb(202, 197, 197);">
+        <div class="rectangle-label" style="left:75px; top:125px">Tables</div>
+      </div>
+
+      <div class="grey-rectangle" style="left: 350px; top: 650px; width: 400px; height: 250px; background-color: rgb(202, 197, 197);">
+        <div class="rectangle-label" style="left:150px; top:125px">Tables</div>
+      </div>
+
+      <div class="grey-rectangle" style="left: 0; top: 900px; width: 750px; height: 100px; background-color: rgba(24, 23, 23, 0.5);">
+        <div class="rectangle-label" style="left:500px; top:50px; color: black;">External</div>
+      </div>
+
+      <div class="grey-rectangle" style="left: 750px; top: 0; width: 250px; height: 1000px; background-color: rgba(24, 23, 23, 0.5);"></div>
+
+      <div class="grey-rectangle" style="left: 0; top: 0; width: 750px; height: 150px; background-color: rgba(24, 23, 23, 0.5);"></div>
+      <div class="black-rectangle" style="width: 50px; height: 10px; top: 150px; left: 600px;"></div>
+
+
+      <div class="black-line" style="width: 1000px; height: 2px; top: 150px; left: 0;"></div>
+      <div class="black-rectangle" style="width: 50px; height: 10px; top: 890px; left: 275px;"></div>
+      <div class="black-line" style="width: 1000px; height: 2px; top: 900px; left: 0;"></div>
+      <div class="black-rectangle" style="width: 50px; height: 10px; top: 890px; left: 275px;"></div>
+      <div class="black-line" style="width: 2px; height: 1000px; top: 0; left: 750px;"></div>
+      <div class="black-rectangle" style="width: 10px; height: 50px; top: 600px; left: 740px;"></div>
+
+      <div id="pose-container">
+        <div id="arrow-head"></div>
+        <div id="arrow-tail"></div>
+        <div id="beacon"></div>
+        <div id="line-left"></div>
+        <div id="line-right"></div>
+      </div>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script> /* JS logic in this script */ 
+    const socket = io(); // Create websocket connection to server 
+    const xMin = -4.75; 
+    const yMin = -2;
+    const xMax = 15;
+    const yMax = 18;
+    
+    socket.on('pose_data', (data) => {
+      console.log('Received data from server:',data);
+      moveBeacon(data.x,data.y,data.alphabet,data.conf); 
+      }
+    )
+    var poseContainer = document.getElementById('pose-container');
+    poseContainer.style.display = 'none';
+
+    document.documentElement.style.setProperty("--arrow-length", 150+"px")
+    
+    function moveBeacon(x,y,alphabet,conf) {
+      console.log('Move Beacon');
+
+      const posX = ((x - xMin) / (xMax - xMin)) * 100; // Convert to percentage
+      const posY = 100 - ((y - yMin) / (yMax - yMin)) * 100;
+      console.log(posY)
+      updateArrowTailLength(conf)
+      var poseContainer = document.getElementById('pose-container');
+      poseContainer.style.display = 'block';
+      // poseContainer.style.left = x + '%';
+      // poseContainer.style.top = y + '%';
+      poseContainer.style.left = posX + '%';
+      poseContainer.style.top = posY + '%';
+
+      // Adjust heading
+      let heading;
+      switch (alphabet) {
+        case "A": 
+          poseContainer.style.transform = 'rotate(270deg)';
+          break;
+        case "B":
+          poseContainer.style.transform = 'rotate(180deg)';          
+          break;
+        case "C":
+          poseContainer.style.transform = 'rotate(90deg)';
+          break;
+        case "D":
+          poseContainer.style.transform = 'rotate(0deg)';
+          break;
+      }
+    }
+    
+    function updateArrowTailLength(value) {
+      const arrowTail = document.getElementById('arrow-tail');
+      arrowTail.style.width = value + "px";
+      document.documentElement.style.setProperty("--arrow-length", value+"px")
+    }
+
+  </script>
+</body>
+</html>
